@@ -1,33 +1,37 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css"; 
 import "swiper/css/navigation"; 
 import ServiceCard from "./DisplayCard";
-import ServicesReadMore from "./ReadMoreDisplayCard";
 import { servicesData } from "../constants/staticData";
 
 const HomeServices = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedService, setSelectedService] = useState(null);
+  const navigate = useNavigate();
 
   const filteredServices = servicesData.filter((service) =>
     service.serviceName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleReadMore = (service) => {
-    setSelectedService(service);
-  };
-
-  const handleClosePopup = () => {
-    setSelectedService(null);
+  // Function to handle navigation to service page
+  const handleServiceClick = (serviceName) => {
+    // Convert service name to lowercase and replace spaces/special characters
+    const routePath = serviceName.toLowerCase()
+      .replace(/\s+/g, '')       // Remove spaces
+      .replace(/\//g, '-')       // Replace / with -
+      .replace(/\./g, '')        // Remove dots
+      .replace(/\s*\/\s*/g, '-'); // Handle slashes with spaces
+    
+    navigate(`/${routePath}`);
   };
 
   return (
     <div className="bg-blue-100 py-16">
       <div className="m-auto flex flex-col items-center px-6 md:px-12 lg:px-7">
         <h2 className="text-blue-800 text-4xl md:text-5xl font-bold text-center mb-8">
-        Certification of Management Systems
+          Certification of Management Systems
         </h2>
 
         <div className="w-full max-w-md mb-8">
@@ -59,7 +63,7 @@ const HomeServices = () => {
                 <ServiceCard
                   displayName={service.serviceName}
                   displayDescription={service.serviceDescription}
-                  onReadMore={() => handleReadMore(service)}
+                  onClick={() => handleServiceClick(service.serviceName)}
                   color="blue"
                 />
               </SwiperSlide>
@@ -67,15 +71,6 @@ const HomeServices = () => {
           </Swiper>
         </div>
       </div>
-
-      {selectedService && (
-        <ServicesReadMore
-          displayName={selectedService.serviceName}
-          displayDescription={selectedService.serviceDescription}
-          onClose={handleClosePopup}
-          color="blue"
-        />
-      )}
     </div>
   );
 };

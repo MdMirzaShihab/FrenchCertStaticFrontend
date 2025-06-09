@@ -1,6 +1,6 @@
 import React from "react";
 
-const DisplayCard = ({ displayName, displayDescription, onReadMore, color }) => {
+const DisplayCard = ({ displayName, displayDescription, onClick , color }) => {
   // Limit the description to 100 characters
   const truncatedDescription =
     displayDescription.length > 100
@@ -12,7 +12,7 @@ const DisplayCard = ({ displayName, displayDescription, onReadMore, color }) => 
       className={`bg-gradient-to-b from-white to-${color}-200 shadow-xl shadow-${color}-300 rounded-2xl p-4 border-4 border-${color}-200 sm:w-[299px] w-full transition-transform duration-700 transform hover:-translate-y-3`}
     >
       <div className="relative w-full">
-        <button onClick={onReadMore}>
+        <button onClick={onClick}>
           <div className="py-7 flex flex-col text-center">
             <p className={`text-${color}-500 px-2 pb-4 font-bold font-ubuntu text-[24px]`}>
               {displayName}

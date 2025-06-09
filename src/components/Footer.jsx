@@ -24,11 +24,11 @@ const Footer = () => {
                 Certificate Validation
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="/training" className="text-gray-300 hover:text-red-500 transition-colors duration-300">
                   Training Programs
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a href="/accreditations" className="text-gray-300 hover:text-red-500 transition-colors duration-300">
                   Accreditations

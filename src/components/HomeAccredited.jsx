@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 import AccreditationCard from "./DisplayCard";
 import AccreditationsReadMore from "./ReadMoreDisplayCard";
 import { accreditationData } from "../constants/staticData";
-import cert from "../assets/Cert.png"; // Import the 3D image
+import cert from "../assets/Cert.png";
 
 const HomeAccredited = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,7 +71,7 @@ const HomeAccredited = () => {
                 <AccreditationCard
                   displayName={accreditation.accreditationName}
                   displayDescription={accreditation.accreditationDescription}
-                  onReadMore={() => handleReadMore(accreditation)}
+                  onClick={() => handleReadMore(accreditation)}
                   color="red"
                 />
               </SwiperSlide>

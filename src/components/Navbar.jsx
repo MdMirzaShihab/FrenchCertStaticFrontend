@@ -34,14 +34,14 @@ const Navbar = () => {
               Home
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/process"
               className="hover:text-blue-400 transition"
               onClick={() => setIsOpen(false)}>
               Process
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/services"
@@ -58,7 +58,7 @@ const Navbar = () => {
               About
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/career"
               className="hover:text-blue-400 transition"
@@ -73,7 +73,7 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}>
               Join Us
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/contact"
