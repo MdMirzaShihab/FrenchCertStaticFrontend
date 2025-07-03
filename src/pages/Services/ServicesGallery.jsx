@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSearch, FaFilter, FaTimes, FaCalendarAlt } from "react-icons/fa";
+import { FaSearch, FaFilter, FaTimes, FaCalendarAlt, FaGraduationCap } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { BASE_URL } from "../../../secrets";
+import { BASE_URL } from "../../secrets";
 
-const CertificationGallery = () => {
+const ServicesGallery = () => {
   const [state, setState] = useState({
     certifications: [],
     loading: true,
@@ -32,13 +32,14 @@ const CertificationGallery = () => {
 
   const navigate = useNavigate();
 
+  // Fetch certifications using the public endpoint
   const fetchCertifications = useCallback(async (page = 1) => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
       
       const params = {
         page,
-        limit: 9,
+        limit: 9, // Optimized for 3x3 grid
         ...(searchTerm && { search: searchTerm }),
         ...(selectedType && { type: selectedType })
       };
@@ -58,6 +59,7 @@ const CertificationGallery = () => {
     }
   }, [searchTerm, selectedType]);
 
+  // Fetch certification types
   const fetchCertificationTypes = useCallback(async () => {
     try {
       const response = await axios.get(`${BASE_URL}/api/certifications/types/list`);
@@ -97,7 +99,29 @@ const CertificationGallery = () => {
   };
 
   const handleViewDetails = (id) => {
-    navigate(`/certifications/${id}`);
+    navigate(`/service-detail/${id}`);
+  };
+
+  // Animation variants
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    },
+    hover: {
+      y: -10,
+      scale: 1.03,
+      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      transition: {
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    }
   };
 
   const LoadingSpinner = () => (
@@ -110,14 +134,12 @@ const CertificationGallery = () => {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="bg-white p-8 rounded-lg shadow-md text-center max-w-md mx-auto border-2 border-dashed border-gray-300"
+      className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md mx-auto"
     >
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-        <svg className="w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 mb-4">
+        <FaGraduationCap className="w-10 h-10 text-blue-500" />
       </div>
-      <h3 className="mt-2 text-lg font-bold text-gray-900">No certifications found</h3>
+      <h3 className="mt-2 text-xl font-bold text-gray-900">No certifications found</h3>
       <p className="mt-2 text-gray-600">
         Try adjusting your search or filter criteria
       </p>
@@ -126,7 +148,7 @@ const CertificationGallery = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleResetFilters}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Reset Filters
         </motion.button>
@@ -135,61 +157,70 @@ const CertificationGallery = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-2">
-            Our Certifications
+        {/* Hero Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+            Explore Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-700">Services</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Advance your career with our professional certification programs
+          Internationally recognized standards to help your organization excel
           </p>
-        </div>
+        </motion.div>
 
-        {/* Search and Filter */}
-        <div className="bg-white p-4 rounded-lg shadow-sm mb-8 border border-gray-200">
+        {/* Search and Filter Bar */}
+        <motion.div 
+          className="bg-white rounded-2xl shadow-xl p-6 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <FaSearch className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Search certifications..."
+                className="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                placeholder="Search services..."
                 value={searchTerm}
                 onChange={(e) => setState(prev => ({ ...prev, searchTerm: e.target.value }))}
               />
             </div>
             
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={toggleFilters}
-              className={`inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                showFilters
-                  ? 'border-transparent bg-blue-600 text-white'
-                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-              }`}
+              className={`inline-flex items-center justify-center px-6 py-3 border rounded-xl text-lg font-medium ${showFilters ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
             >
               <FaFilter className="mr-2" />
               {showFilters ? 'Hide Filters' : 'Show Filters'}
-            </button>
+            </motion.button>
           </div>
 
+          {/* Filter Panel */}
           <AnimatePresence>
             {showFilters && (
-              <motion.div
+              <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="mt-4 pt-4 border-t border-gray-200"
+                className="mt-6 pt-6 border-t border-gray-200"
               >
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Certification Type</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
                     <select
-                      className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
+                      className="block w-full pl-4 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-xl border"
                       value={selectedType}
                       onChange={(e) => setState(prev => ({ ...prev, selectedType: e.target.value }))}
                     >
@@ -203,25 +234,27 @@ const CertificationGallery = () => {
                   </div>
                 </div>
                 
-                <div className="mt-4 flex justify-end">
-                  <button
+                <div className="mt-6 flex justify-end">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleResetFilters}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-lg font-medium rounded-xl text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     <FaTimes className="mr-2" />
                     Reset Filters
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
 
         {/* Content */}
         {loading ? (
           <LoadingSpinner />
         ) : error ? (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md mb-8">
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-8">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
@@ -237,7 +270,7 @@ const CertificationGallery = () => {
           <EmptyState />
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {certifications.map((cert) => (
                 <motion.div
                   key={cert._id}
@@ -293,22 +326,17 @@ const CertificationGallery = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-8 flex justify-center">
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  <button
-                    onClick={() => fetchCertifications(currentPage - 1)}
+              <div className="flex justify-center">
+                <div className="flex space-x-2">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                      currentPage === 1
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-50'
-                    }`}
+                    onClick={() => fetchCertifications(currentPage - 1)}
+                    className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white text-blue-600 shadow hover:bg-gray-50'}`}
                   >
-                    <span className="sr-only">Previous</span>
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
+                    Previous
+                  </motion.button>
                   
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     let pageNum;
@@ -323,35 +351,28 @@ const CertificationGallery = () => {
                     }
                     
                     return (
-                      <button
+                      <motion.button
                         key={pageNum}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => fetchCertifications(pageNum)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          currentPage === pageNum
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
+                        className={`px-4 py-2 rounded-lg ${currentPage === pageNum ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-blue-600 shadow hover:bg-gray-50'}`}
                       >
                         {pageNum}
-                      </button>
+                      </motion.button>
                     );
                   })}
                   
-                  <button
-                    onClick={() => fetchCertifications(currentPage + 1)}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                      currentPage === totalPages
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-50'
-                    }`}
+                    onClick={() => fetchCertifications(currentPage + 1)}
+                    className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white text-blue-600 shadow hover:bg-gray-50'}`}
                   >
-                    <span className="sr-only">Next</span>
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </nav>
+                    Next
+                  </motion.button>
+                </div>
               </div>
             )}
           </>
@@ -361,4 +382,4 @@ const CertificationGallery = () => {
   );
 };
 
-export default CertificationGallery;
+export default ServicesGallery;

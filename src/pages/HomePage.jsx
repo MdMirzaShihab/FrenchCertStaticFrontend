@@ -1,5 +1,5 @@
 import Hero from "../components/Hero";
-import HomeAccredited from "../components/HomeAccredited";
+import HomeAccredited from "../components/HomeTrainings";
 import HomeServices from "../components/HomeServices";
 
 

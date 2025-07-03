@@ -1,5 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "../secrets";
 
 import HomePage from "../pages/HomePage";
 import ValidateCertificate from "../pages/ValidateCertificate";
@@ -12,20 +15,46 @@ import Contact from "../pages/Contact/Contact";
 import JoinUs from "../pages/JoinUs/JoinUs";
 import Process from "../pages/Processes/Processes";
 import Accreditations from "../pages/Accreditations/Accreditations";
-
-import ISO9001 from "../pages/Services/ISO9001";
-import ISO14001 from "../pages/Services/ISO14001";
-import ISO27001 from "../pages/Services/ISO27001";
-import ISO50001 from "../pages/Services/ISO50001";
-import ISO22000 from "../pages/Services/ISO22000";
-import FSSC22000 from "../pages/Services/FSSC22000";
-import ISO45001 from "../pages/Services/ISO45001";
-import IATF16949 from "../pages/Services/IATF16949";
-import EN9100_EN9120 from "../pages/Services/EN9100_EN9120";
-import CertificationCardList from "../pages/Services/CertificationCardList";
-import CertificationDetail from "../pages/Services/CertificationDetail";
+import ServicesGallery from "../pages/Services/ServicesGallery";
+import ServiceDetail from "../pages/Services/ServiceDetail";
+import TrainingsGallery from "../pages/Trainings/TrainingsGallery";
+import TrainingDetail from "../pages/Trainings/TrainingDetail";
+import DynamicPage from "../pages/DynamicPage";
 
 const AppRoutes = () => {
+  const [dynamicRoutes, setDynamicRoutes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-20">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+    </div>
+  );
+
+
+  useEffect(() => {
+    const fetchNavbarPages = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/pages/navbar`);
+        setDynamicRoutes(response.data.data);
+      } catch (err) {
+        console.error('Failed to fetch navbar pages:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNavbarPages();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <Routes>
       {/* Public routes with main layout */}
@@ -46,20 +75,21 @@ const AppRoutes = () => {
         <Route path="process" element={<Process />} />
 
         {/* Service pages */}
-        <Route path="iso9001" element={<ISO9001 />} />
-        <Route path="iso14001" element={<ISO14001 />} />
-        <Route path="iso27001" element={<ISO27001 />} />
-        <Route path="iso50001" element={<ISO50001 />} />
-        <Route path="iso22000" element={<ISO22000 />} />
-        <Route path="fssc22000" element={<FSSC22000 />} />
-        <Route path="iso45001" element={<ISO45001 />} />
-        <Route path="iatf16949" element={<IATF16949 />} />
-        <Route path="en9100-en9120" element={<EN9100_EN9120 />} />
-        <Route path="certification-cards" element={<CertificationCardList />} />
-        <Route
-          path="certification-cards/:id"
-          element={<CertificationDetail />}
-        />
+        <Route path="/services-gallery" element={<ServicesGallery />} />
+        <Route path="/service-detail/:id" element={<ServiceDetail />} />
+
+        {/* Training pages */}
+        <Route path="/trainings-gallery" element={<TrainingsGallery />} />
+        <Route path="/training-detail/:id" element={<TrainingDetail />} />
+
+        {/* Dynamic pages from backend */}
+        {dynamicRoutes.map((page) => (
+  <Route 
+    key={page._id} 
+    path={`/${page.slug}`}
+    element={<DynamicPage />} 
+  />
+))}
       </Route>
     </Routes>
   );

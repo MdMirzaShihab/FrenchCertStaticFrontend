@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { companiesData } from "../constants/staticData";
+import axios from "axios";
 
 const ValidateCertificate = () => {
   const { certificationID } = useParams();
-  const [certificate, setCertificate] = useState(null);
-  const [company, setCompany] = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   // Function to format date as dd/mm/yy
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString || dateString === "N/A") return "N/A";
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "N/A";
+    
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = String(date.getFullYear()).slice(-2);
@@ -20,33 +22,45 @@ const ValidateCertificate = () => {
   };
 
   useEffect(() => {
-    // Reset state
-    setCertificate(null);
-    setCompany(null);
-    setError("");
-    setSuccess("");
-
-    // Search for the certificate in companiesData
-    let foundCertificate = null;
-    let foundCompany = null;
-    for (const company of companiesData) {
-      foundCertificate = company.certifications.find(
-        (cert) => cert.certificationID === certificationID
-      );
-      if (foundCertificate) {
-        foundCompany = company;
-        break;
+    const fetchCertificate = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        setSuccess("");
+        
+        const response = await axios.get(
+          `http://localhost:5000/api/company-certifications/verify/${certificationID}`
+        );
+        
+        if (response.data.success) {
+          setData(response.data.data);
+          setSuccess("Certificate verified successfully!");
+        } else {
+          setError("Certificate not found. Please check the ID and try again.");
+        }
+      } catch (err) {
+        setError(
+          err.response?.data?.message || 
+          "Failed to verify certificate. Please try again later."
+        );
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    if (foundCertificate && foundCompany) {
-      setCertificate(foundCertificate);
-      setCompany(foundCompany);
-      setSuccess("Certificate verified successfully!");
-    } else {
-      setError("Certificate not found. Please check the ID and try again.");
-    }
+    fetchCertificate();
   }, [certificationID]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-green-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Verifying certificate...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-green-50 p-8">
@@ -58,9 +72,7 @@ const ValidateCertificate = () => {
         {/* Display Success Message */}
         {success && (
           <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <p className="text-green-600 font-semibold text-center">
-              {success}
-            </p>
+            <p className="text-green-600 font-semibold text-center">{success}</p>
           </div>
         )}
 
@@ -72,7 +84,7 @@ const ValidateCertificate = () => {
         )}
 
         {/* Display Company Details in Table Format */}
-        {company && (
+        {data && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-blue-800 mb-4">
               Company Details
@@ -95,7 +107,7 @@ const ValidateCertificate = () => {
                       Company Name
                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-gray-700">
-                      {company.companyName}
+                      {data.company.name || ""}
                     </td>
                   </tr>
                   <tr>
@@ -103,8 +115,14 @@ const ValidateCertificate = () => {
                       Status
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                        {certificate.status}
+                      <span 
+                        className={`px-2 py-1 rounded-full text-sm ${
+                          data.company.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {data.company.status || ""}
                       </span>
                     </td>
                   </tr>
@@ -113,7 +131,7 @@ const ValidateCertificate = () => {
                       Company Address
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {company.companyAddress}
+                      {data.company.address || ""}
                     </td>
                   </tr>
                   <tr>
@@ -121,7 +139,7 @@ const ValidateCertificate = () => {
                       Scope
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {company.companyScope}
+                      {data.company.scope || ""}
                     </td>
                   </tr>
                   <tr>
@@ -129,17 +147,23 @@ const ValidateCertificate = () => {
                       Company Origin
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {company.companyOrigin}
+                      {data.company.origin || ""}
                     </td>
                   </tr>
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Site 2:
+                      Site 2:
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {/* Empty as not in API */}
                     </td>
                   </tr>
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Scope 2:
+                      Scope 2:
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {/* Empty as not in API */}
                     </td>
                   </tr>
                 </tbody>
@@ -149,7 +173,7 @@ const ValidateCertificate = () => {
         )}
 
         {/* Display Certification Details in Table Format */}
-        {certificate && (
+        {data && (
           <div>
             <h2 className="text-2xl font-bold text-blue-800 mb-4">
               Certification Details
@@ -172,24 +196,23 @@ const ValidateCertificate = () => {
                       Certification Number
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {certificate.certificationID}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Scheme
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      {certificate.certificationName}
+                      {data.certificate.id || ""}
                     </td>
                   </tr>
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-gray-700">
-                    Validity Period
+                      Scheme
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {certificate.validity}
+                      {data.certificate.scheme || ""}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-700">
+                      Validity Period
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {data.certificate.validityPeriod || ""}
                     </td>
                   </tr>
                   <tr>
@@ -197,7 +220,7 @@ const ValidateCertificate = () => {
                       Issue Date
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {formatDate(certificate.issueDate)}
+                      {formatDate(data.certificate.issueDate)}
                     </td>
                   </tr>
                   <tr>
@@ -205,7 +228,7 @@ const ValidateCertificate = () => {
                       First Surveillance Date
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {formatDate(certificate.FirstSurveillanceDate)}
+                      {formatDate(data.certificate.firstSurveillanceDate)}
                     </td>
                   </tr>
                   <tr>
@@ -213,7 +236,7 @@ const ValidateCertificate = () => {
                       Second Surveillance Date
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {formatDate(certificate.SecondSurveillanceDate)}
+                      {formatDate(data.certificate.secondSurveillanceDate)}
                     </td>
                   </tr>
                   <tr>
@@ -221,7 +244,7 @@ const ValidateCertificate = () => {
                       Expiry Date
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {formatDate(certificate.expiryDate)}
+                      {formatDate(data.certificate.expiryDate)}
                     </td>
                   </tr>
                   <tr>
@@ -229,7 +252,7 @@ const ValidateCertificate = () => {
                       Accreditation
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {certificate.Accreditation}
+                    AB-CAB
                     </td>
                   </tr>
                 </tbody>
