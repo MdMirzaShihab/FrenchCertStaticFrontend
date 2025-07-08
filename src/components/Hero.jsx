@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import coverImg from "../assets/Cover.webp";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   useEffect(() => {
@@ -61,9 +62,9 @@ const Hero = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                  <button className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+                  <Link to="/services-gallery" className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
                     Explore Certifications
-                  </button>
+                  </Link>
                   <button className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md border border-blue-200 hover:bg-blue-50 transition-all duration-300 transform hover:scale-105">
                     Speak to an Expert
                   </button>
