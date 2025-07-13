@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { BASE_URL } from "../secrets";
 
 const ValidateCertificate = () => {
   const { certificationID } = useParams();
@@ -29,7 +30,7 @@ const ValidateCertificate = () => {
         setSuccess("");
         
         const response = await axios.get(
-          `http://localhost:5000/api/company-certifications/verify/${certificationID}`
+          `${BASE_URL}/api/company-certifications/verify/${certificationID}`
         );
         
         if (response.data.success) {
