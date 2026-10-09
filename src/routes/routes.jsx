@@ -14,7 +14,6 @@ import About from "../pages/AboutUs/AboutUs";
 import Contact from "../pages/Contact/Contact";
 import JoinUs from "../pages/JoinUs/JoinUs";
 import Process from "../pages/Processes/Processes";
-import Accreditations from "../pages/Accreditations/Accreditations";
 import ServicesGallery from "../pages/Services/ServicesGallery";
 import ServiceDetail from "../pages/Services/ServiceDetail";
 import TrainingsGallery from "../pages/Trainings/TrainingsGallery";
@@ -66,7 +65,6 @@ const AppRoutes = () => {
         />
         <Route path="login" element={<CompanyLogin />} />
         <Route path="company-details/:companyID" element={<CompanyDetails />} />
-        <Route path="accreditations" element={<Accreditations />} />
         <Route path="career" element={<Career />} />
         <Route path="services" element={<Services />} />
         <Route path="about" element={<About />} />
